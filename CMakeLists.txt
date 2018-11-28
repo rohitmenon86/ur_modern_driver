@@ -1,22 +1,23 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(ur_modern_driver)
-add_definitions( -DROS_BUILD )
+project(ur_driver)
+
+#add_definitions( -DROS_BUILD )
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED COMPONENTS
-  hardware_interface
-  controller_manager
-  actionlib
-  control_msgs
-  geometry_msgs
-  roscpp
-  sensor_msgs
-  std_msgs
-  trajectory_msgs
-  ur_msgs
-  tf
-)
+#find_package(catkin REQUIRED COMPONENTS
+#  hardware_interface
+#  controller_manager
+#  actionlib
+#  control_msgs
+#  geometry_msgs
+#  roscpp
+#  sensor_msgs
+#  std_msgs
+#  trajectory_msgs
+#  ur_msgs
+#  tf
+#)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -107,16 +108,19 @@ find_package(catkin REQUIRED COMPONENTS
 ## LIBRARIES: libraries you create in this project that dependent projects also need
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
-catkin_package(
-  INCLUDE_DIRS include
+#catkin_package(
+#  INCLUDE_DIRS include
 #  LIBRARIES ur_modern_driver
-  CATKIN_DEPENDS hardware_interface controller_manager actionlib control_msgs geometry_msgs roscpp sensor_msgs trajectory_msgs ur_msgs
-  DEPENDS ur_hardware_interface
-)
+#  CATKIN_DEPENDS hardware_interface controller_manager actionlib control_msgs geometry_msgs roscpp sensor_msgs trajectory_msgs ur_msgs
+#  DEPENDS ur_hardware_interface
+#)
 
 ###########
 ## Build ##
 ###########
+
+CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}.pc.in ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.pc @ONLY)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.pc DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/pkgconfig)
 
 # check c++11 / c++0x
 include(CheckCXXCompilerFlag)
@@ -132,18 +136,18 @@ endif()
 
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
-# include_directories(include)
-include_directories(include
-  ${catkin_INCLUDE_DIRS}
-)
+include_directories(include)
+#include_directories(include
+#  ${catkin_INCLUDE_DIRS}
+#)
 
 ## Declare a C++ library
 
 # Hardware Interface
-add_library(ur_hardware_interface src/ur_hardware_interface.cpp)
-target_link_libraries(ur_hardware_interface
-  ${catkin_LIBRARIES}
-)
+#add_library(ur_hardware_interface src/ur_hardware_interface.cpp)
+#target_link_libraries(ur_hardware_interface
+#  ${catkin_LIBRARIES}
+#)
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
@@ -151,42 +155,42 @@ target_link_libraries(ur_hardware_interface
 # add_dependencies(ur_modern_driver ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Declare a C++ executable
-set(${PROJECT_NAME}_SOURCES
-    src/ur_ros_wrapper.cpp
+set(ur_sources
+    #src/ur_ros_wrapper.cpp
     src/ur_driver.cpp
     src/ur_realtime_communication.cpp
     src/ur_communication.cpp
     src/robot_state.cpp
     src/robot_state_RT.cpp
     src/do_output.cpp)
-add_executable(ur_driver ${${PROJECT_NAME}_SOURCES})
+add_library(${PROJECT_NAME} SHARED ${ur_sources})
+#add_executable(ur_driver ${${PROJECT_NAME}_SOURCES})
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
- add_dependencies(ur_driver ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+#add_dependencies(ur_driver ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(ur_driver
-  ur_hardware_interface
-  ${catkin_LIBRARIES}
- )
+#target_link_libraries(ur_driver
+#  ur_hardware_interface
+#  ${catkin_LIBRARIES}
+#)
 
 #############
 ## Install ##
 #############
 
-install(DIRECTORY launch/ DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch)
-install(DIRECTORY config/ DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/config)
+#install(DIRECTORY launch/ DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch)
+#install(DIRECTORY config/ DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/config)
 
 ## Mark executables and/or libraries for installation
-install(TARGETS ur_driver ur_hardware_interface
-  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+install(TARGETS ${PROJECT_NAME}
+  LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/lib
 )
 
 ## Mark cpp header files for installation
-install(DIRECTORY include/${PROJECT_NAME}/
-  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+install(DIRECTORY include/ur_modern_driver/
+  DESTINATION ${CMAKE_INSTALL_PREFIX}/include/${PROJECT_NAME}
   FILES_MATCHING PATTERN "*.h"
 )
 
